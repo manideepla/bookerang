@@ -1,17 +1,20 @@
 package com.manideepla.bookerang;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    
-    @PostMapping("/signup")
-    void signupUser(@RequestBody User user) {
-        System.out.println(user);
-    }
 
+    @Autowired
+    UserService userService;
+
+
+    @GetMapping("/{username}")
+    public Mono<User> findUserByUsername(@PathVariable("username") String username) {
+        return userService.findUser(username);
+    }
 }
