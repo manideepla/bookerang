@@ -17,4 +17,10 @@ public class UserController {
     public Mono<User> findUserByUsername(@PathVariable("username") String username) {
         return userService.findUser(username);
     }
+
+
+    @PostMapping("/signup")
+    public Mono<User> signupUser(@RequestBody User user) {
+        return userService.signupUser(user);
+    }
 }

@@ -11,7 +11,15 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    // TODO   handle non-existence of username
     Mono<User> findUser(String username) {
-         return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
+
+
+    // TODO handle uniqueness of username
+    Mono<User> signupUser(User user) {
+        return userRepository.save(user);
+    }
+
 }

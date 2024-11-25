@@ -1,4 +1,11 @@
 package com.manideepla.bookerang;
 
-public record User(String id, String username, String firstName, String lastName) {
+
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Table("users")
+public record User(String username,
+                   @Column("first_name") String firstName,
+                   @Column("last_name") String lastName) {
 }
