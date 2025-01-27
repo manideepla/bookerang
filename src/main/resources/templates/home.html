@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+</head>
+<body>
+
+<div id="location-container">
+    <p>Fetching location...</p>
+</div>
+
+<script th:inline="javascript">
+    const { hx } = window;
+
+    window.addEventListener('load', () => {
+        getLocation();
+    });
+
+    const getLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const locationData = { latitude, longitude };
+                    console.log('Location fetched:', locationData);
+                    hx.trigger('location-fetched', locationData);
+                },
+                (error) => {
+                    document.getElementById('location-container').innerHTML = `<p>Error: ${error.message}</p>`;
+                }
+            );
+        } else {
+            document.getElementById('location-container').innerHTML = `<p>Geolocation is not supported by this browser.</p>`;
+        }
+    };
+</script>
+
+</body>
+</html>
