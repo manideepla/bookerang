@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookerang</title>
+  <script src="https://unpkg.com/htmx.org@1.7.0"></script>
+</head>
+<body>
+<form th:action="@{/user/signup}" th:object="${user}" method="post">
+  <label>
+    <input type="text" th:field="*{firstName}" placeholder="First Name" required>
+  </label>
+  <label>
+    <input type="text" th:field="*{lastName}" placeholder="Last Name" required>
+  </label>
+  <label>
+    <input type="text" th:field="*{username}" placeholder="Username" required>
+  </label>
+  <button type="submit">Sign Up</button>
+</form>
+</body>
+</html>

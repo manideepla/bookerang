@@ -1,8 +1,8 @@
 package com.manideepla.bookerang
 
-import org.springframework.data.r2dbc.repository.R2dbcRepository
+import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 
 @Repository
-interface UserRepository : R2dbcRepository<User, Long>
+interface UserRepository : CrudRepository<User, String>
