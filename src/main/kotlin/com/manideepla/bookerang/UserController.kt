@@ -22,14 +22,44 @@ class UserController {
     @PostMapping("/signup")
     fun userSignup(@ModelAttribute user: User): String {
         val u = userService.signupUser(user)
-        return u.let {
-            "redirect:/user/signupSuccess?username=${u.username}"
+
+        return if (u.isSuccess) {
+            "redirect:/user/home?username=${u.getOrNull()?.username}"
+        } else {
+            val msg = "Signup failed for user ${user.username}"
+            "redirect:/user/failure?message=$msg"
         }
     }
 
-    @GetMapping("/signupSuccess")
-    fun showSignupSuccess(@RequestParam username: String, model: Model): String {
-        model.addAttribute("username", username)
-        return "signupSuccess"
+    @GetMapping("/login")
+    fun showLoginForm(model: Model): String {
+        model.addAttribute("user", User())
+        return "login"
     }
+
+    @PostMapping("/login")
+    fun userLogin(@ModelAttribute user: User): String {
+        val u = userService.loginUser(user)
+
+        return if (u.isSuccess) {
+            "redirect:/user/home?username=${u.getOrNull()?.username}"
+        } else {
+            val msg = "Login failed for user ${user.username}"
+            "redirect:/user/failure?message=$msg"
+        }
+    }
+
+
+    @GetMapping("/home")
+    fun showUserHome(@RequestParam username: String, model: Model): String {
+        model.addAttribute("username", username)
+        return "home"
+    }
+
+    @GetMapping("/failure")
+    fun showFailure(@RequestParam message: String, model: Model): String {
+        model.addAttribute("message", message)
+        return "error"
+    }
+
 }

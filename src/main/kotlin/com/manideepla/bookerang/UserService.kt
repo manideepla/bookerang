@@ -10,7 +10,22 @@ class UserService {
     @Autowired
     lateinit var userRepository: UserRepository
 
-    fun signupUser(user: User): User {
-        return userRepository.save(user)
+    fun signupUser(user: User): Result<User> {
+      return try {
+            val u = userRepository.save(user)
+            Result.success(u)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    fun loginUser(user: User): Result<User> {
+        return try {
+            val u = userRepository.findByUsername((user.username))
+            Result.success(u)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

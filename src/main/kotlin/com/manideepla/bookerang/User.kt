@@ -9,5 +9,6 @@ data class User(
     @Id val id: Long? = null,
     val username: String = "",
     @Column("first_name") val firstName: String = "",
-    @Column("last_name") val lastName: String = ""
+    @Column("last_name") val lastName: String = "",
+    val password: String = ""
 )
