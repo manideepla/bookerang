@@ -7,6 +7,7 @@ import org.springframework.data.relational.core.mapping.Table
 @Table("users")
 data class User(
     @Id val id: Long? = null,
+    @Column("username")
     val username: String = "",
     @Column("first_name") val firstName: String = "",
     @Column("last_name") val lastName: String = "",

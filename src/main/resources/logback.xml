@@ -6,7 +6,10 @@
         </layout>
     </appender>
 
+    <logger name="org.thymeleaf.TemplateEngine" level="ERROR"/>
+
     <root level="DEBUG">
         <appender-ref ref="CONSOLE" />
     </root>
+
 </configuration>

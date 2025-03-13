@@ -20,9 +20,9 @@ class UserService {
     }
 
 
-    fun loginUser(user: User): Result<User> {
+    fun loginUser(user: User): Result<User?> {
         return try {
-            val u = userRepository.findByUsername((user.username))
+            val u = userRepository.findByUsername(user.username)
             Result.success(u)
         } catch (e: Exception) {
             Result.failure(e)
