@@ -12,16 +12,16 @@ import reactor.core.publisher.Mono;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    UserHandler userHandler;
 
     @PostMapping("/signup")
     Mono<ResponseEntity<MessageResponse>> userSignup(@RequestBody User user) {
-        return userService.saveUser(user).map(u -> ResponseEntity.ok(new MessageResponse(u)));
+        return userHandler.saveUser(user).map(u -> ResponseEntity.ok(new MessageResponse(u)));
     }
 
 
     @GetMapping("/{username}")
     Mono<ResponseEntity<User>> getUser(@PathVariable String username) {
-        return userService.findUser(username).map(ResponseEntity::ok);
+        return userHandler.findUser(username).map(ResponseEntity::ok);
     }
 }

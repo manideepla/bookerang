@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 
 @Service
-public class UserService {
+public class UserHandler {
 
     @Autowired
     UserRepository userRepository;
@@ -15,19 +15,17 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    UserMinion userMinion;
+
     Mono<String> saveUser(User user) {
 
-        String hashed = passwordEncoder.encode(user.password());
-
-        User hashedUser = new User(
-                user.username(),
-                hashed,
-                user.firstName(),
-                user.lastName()
-        );
-
-        return userRepository.save(hashedUser).map(User::username);
+        return Mono.just(user)
+                .map(u -> passwordEncoder.encode(user.password()))
+                .flatMap(hashed -> userMinion.rehashedUser(hashed, user))
+                .flatMap(hashedUser -> userRepository.save(hashedUser)).map(User::username);
     }
+
 
     Mono<User> findUser(String username) {
         return userRepository.findByUsername(username);
