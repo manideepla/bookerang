@@ -3,10 +3,7 @@ package com.manideepla.bookerang;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 
@@ -18,7 +15,13 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/signup")
-    Mono<ResponseEntity<User>> userSignup(@RequestBody User user) {
-        return userService.saveUser(user).map(ResponseEntity::ok);
+    Mono<ResponseEntity<MessageResponse>> userSignup(@RequestBody User user) {
+        return userService.saveUser(user).map(u -> ResponseEntity.ok(new MessageResponse(u)));
+    }
+
+
+    @GetMapping("/{username}")
+    Mono<ResponseEntity<User>> getUser(@PathVariable String username) {
+        return userService.findUser(username).map(ResponseEntity::ok);
     }
 }
