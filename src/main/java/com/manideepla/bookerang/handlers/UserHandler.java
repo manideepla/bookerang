@@ -1,13 +1,18 @@
-package com.manideepla.bookerang;
+package com.manideepla.bookerang.handlers;
 
+import com.manideepla.bookerang.minions.UserMinion;
+import com.manideepla.bookerang.repositories.UserRepository;
+import com.manideepla.bookerang.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 
 @Service
-public class UserHandler {
+public class UserHandler implements ReactiveUserDetailsService {
 
     @Autowired
     UserRepository userRepository;
@@ -18,7 +23,7 @@ public class UserHandler {
     @Autowired
     UserMinion userMinion;
 
-    Mono<String> saveUser(User user) {
+    public Mono<String> saveUser(User user) {
 
         return Mono.just(user)
                 .map(u -> passwordEncoder.encode(user.password()))
@@ -27,7 +32,12 @@ public class UserHandler {
     }
 
 
-    Mono<User> findUser(String username) {
+    public Mono<User> findUser(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public Mono<UserDetails> findByUsername(String username) {
+        return userRepository.findByUsername(username).cast(UserDetails.class);
     }
 }

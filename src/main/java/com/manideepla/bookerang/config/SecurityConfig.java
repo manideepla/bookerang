@@ -1,4 +1,4 @@
-package com.manideepla.bookerang;
+package com.manideepla.bookerang.config;
 
 
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,6 @@ public class SecurityConfig {
                         .anyExchange().authenticated())
                 .build();
     }
-
 
     @Bean
     PasswordEncoder passwordEncoder() {
