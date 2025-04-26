@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 public class UserMinion {
 
     public Mono<User> rehashedUser(String hashed, User u) {
-        User rehashedUser = new User(u.username(), hashed, u.firstName(), u.lastName());
-        return Mono.just(rehashedUser);
+        return Mono.just(u)
+                .map(user -> new User(u.username(), hashed, u.firstName(), u.lastName()));
     }
 }
