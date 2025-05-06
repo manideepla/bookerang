@@ -1,6 +1,7 @@
 package com.manideepla.bookerang.handlers;
 
 import com.manideepla.bookerang.minions.UserMinion;
+import com.manideepla.bookerang.models.LoginRequest;
 import com.manideepla.bookerang.repositories.UserRepository;
 import com.manideepla.bookerang.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,14 @@ public class UserHandler implements ReactiveUserDetailsService {
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findByUsername(username).cast(UserDetails.class);
+    }
+
+    public Mono<Boolean> loginUser(LoginRequest loginRequest) {
+          return userRepository.findByUsername(loginRequest.username())
+                  .map(user -> checkPassword(user.password(), loginRequest.password()));
+    }
+
+    boolean checkPassword(String encodedPassword, String password) {
+        return passwordEncoder.matches(password, encodedPassword);
     }
 }
