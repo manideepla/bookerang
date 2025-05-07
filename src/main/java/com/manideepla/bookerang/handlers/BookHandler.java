@@ -4,6 +4,8 @@ import com.manideepla.bookerang.models.AddBookRequest;
 import com.manideepla.bookerang.models.Author;
 import com.manideepla.bookerang.models.Book;
 import com.manideepla.bookerang.models.UserCopy;
+import com.manideepla.bookerang.models.GetBooksResponse;
+import com.manideepla.bookerang.models.UserCopyItem;
 import com.manideepla.bookerang.repositories.AuthorRepository;
 import com.manideepla.bookerang.repositories.BookRepository;
 import com.manideepla.bookerang.repositories.CopyRepository;
@@ -34,5 +36,12 @@ public class BookHandler {
                 .map(savedBook -> new UserCopy(null, savedBook.id(), username))
                 .flatMap(userCopy -> copyRepository.save(userCopy))
                 .map(UserCopy::id);
+    }
+
+    public Mono<GetBooksResponse> getBooks(String username) {
+        return copyRepository.findAllByOwner(username)
+                .map(userCopy -> new UserCopyItem(userCopy.id().toString(), userCopy.bookId().toString()))
+                .collectList()
+                .map(GetBooksResponse::new);
     }
 }
