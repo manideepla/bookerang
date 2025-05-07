@@ -1,4 +1,4 @@
 package com.manideepla.bookerang.models;
 
-public record UserCopyItem(String id, String bookTitle) {
+public record UserCopyItem(String id, String title) {
 }

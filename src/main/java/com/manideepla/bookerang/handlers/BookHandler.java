@@ -29,8 +29,8 @@ public class BookHandler {
     CopyRepository copyRepository;
 
     public Mono<UUID> addBook(AddBookRequest addBookRequest, String username) {
-        return  Mono.just(addBookRequest.author())
-                .flatMap( authorName -> authorRepository.save(new Author(null, authorName)))
+        return Mono.just(addBookRequest.author())
+                .flatMap(authorName -> authorRepository.save(new Author(null, authorName)))
                 .map(author -> new Book(addBookRequest.title(), author.id(), null))
                 .flatMap(book -> bookRepository.save(book))
                 .map(savedBook -> new UserCopy(null, savedBook.id(), username))
@@ -40,7 +40,8 @@ public class BookHandler {
 
     public Mono<GetBooksResponse> getBooks(String username) {
         return copyRepository.findAllByOwner(username)
-                .map(userCopy -> new UserCopyItem(userCopy.id().toString(), userCopy.bookId().toString()))
+                .flatMap(userCopy -> bookRepository.findById(userCopy.bookId())
+                                              .map(book -> new UserCopyItem(userCopy.id().toString(), book.title())))
                 .collectList()
                 .map(GetBooksResponse::new);
     }
