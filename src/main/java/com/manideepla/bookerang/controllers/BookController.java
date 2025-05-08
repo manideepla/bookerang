@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -33,11 +34,11 @@ public class BookController {
     }
 
 
-    @GetMapping("/user")
-    Mono<ResponseEntity<GetBooksResponse>> getBooks() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(securityContext -> securityContext.getAuthentication().getName())
-                .flatMap(username -> bookHandler.getBooks(username))
+    @GetMapping({"/user", "/user/{username}"})
+    Mono<ResponseEntity<GetBooksResponse>> getBooks(@PathVariable(required = false) String username) {
+        return Mono.justOrEmpty(username)
+                .switchIfEmpty(ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName()))
+                .flatMap(currentUser -> bookHandler.getBooks(currentUser))
                 .map(ResponseEntity::ok);
 
     }
