@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -80,6 +81,14 @@ public class UserController {
                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                             .body(response);
                 });
+    }
+
+    @GetMapping("/nearby")
+    Mono<ResponseEntity<List<String>>> findUsers(@RequestParam int radius) {
+            return userHandler.findUsersNearBy(radius).flatMapMany(userFlux -> userFlux)
+                    .map(User::getUsername)
+                    .collectList()
+                    .map(ResponseEntity::ok);
     }
 
 }

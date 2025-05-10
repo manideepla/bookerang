@@ -5,10 +5,12 @@ import com.manideepla.bookerang.models.LoginRequest;
 import com.manideepla.bookerang.repositories.UserRepository;
 import com.manideepla.bookerang.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
@@ -49,5 +51,11 @@ public class UserHandler implements ReactiveUserDetailsService {
 
     boolean checkPassword(String encodedPassword, String password) {
         return passwordEncoder.matches(password, encodedPassword);
+    }
+
+    public Mono<Flux<User>> findUsersNearBy(int radius) {
+        Mono<String> username = ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName());
+
+        return username.map(u -> userRepository.findUsersWithinDistance(radius, u));
     }
 }
