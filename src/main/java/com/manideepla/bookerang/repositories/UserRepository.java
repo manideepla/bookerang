@@ -1,5 +1,6 @@
 package com.manideepla.bookerang.repositories;
 
+import com.manideepla.bookerang.models.NearbyUserItem;
 import com.manideepla.bookerang.models.User;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +19,11 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
         FROM users
         WHERE username = :excludeUsername
     )
-    SELECT *
+    SELECT users.*,
+          ST_Distance(
+            users.location,
+            (SELECT location FROM excluded_user_location)
+          ) AS distance
     FROM users
     WHERE username != :excludeUsername
       AND ST_DWithin(
@@ -27,6 +32,6 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
             :distance
           )
     """)
-    Flux<User> findUsersWithinDistance(@Param("distance") double distance,
-                                       @Param("excludeUsername") String excludeUsername);
+    Flux<NearbyUserItem> findUsersWithinDistance(@Param("distance") double distance,
+                                                 @Param("excludeUsername") String excludeUsername);
 }

@@ -2,6 +2,7 @@ package com.manideepla.bookerang.handlers;
 
 import com.manideepla.bookerang.minions.UserMinion;
 import com.manideepla.bookerang.models.LoginRequest;
+import com.manideepla.bookerang.models.NearbyUserItem;
 import com.manideepla.bookerang.repositories.UserRepository;
 import com.manideepla.bookerang.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class UserHandler implements ReactiveUserDetailsService {
         return passwordEncoder.matches(password, encodedPassword);
     }
 
-    public Mono<Flux<User>> findUsersNearBy(int radius) {
+    public Mono<Flux<NearbyUserItem>> findUsersNearBy(int radius) {
         Mono<String> username = ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName());
 
         return username.map(u -> userRepository.findUsersWithinDistance(radius, u));

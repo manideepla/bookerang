@@ -4,6 +4,7 @@ package com.manideepla.bookerang.controllers;
 import com.manideepla.bookerang.JwtUtil;
 import com.manideepla.bookerang.handlers.UserHandler;
 import com.manideepla.bookerang.models.LoginRequest;
+import com.manideepla.bookerang.models.NearbyUserItem;
 import com.manideepla.bookerang.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -84,9 +85,8 @@ public class UserController {
     }
 
     @GetMapping("/nearby")
-    Mono<ResponseEntity<List<String>>> findUsers(@RequestParam int radius) {
+    Mono<ResponseEntity<List<NearbyUserItem>>> findUsers(@RequestParam int radius) {
             return userHandler.findUsersNearBy(radius).flatMapMany(userFlux -> userFlux)
-                    .map(User::getUsername)
                     .collectList()
                     .map(ResponseEntity::ok);
     }
