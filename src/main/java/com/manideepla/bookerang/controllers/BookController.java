@@ -3,6 +3,7 @@ package com.manideepla.bookerang.controllers;
 
 import com.manideepla.bookerang.handlers.BookHandler;
 import com.manideepla.bookerang.models.AddBookRequest;
+import com.manideepla.bookerang.models.BooksResponse;
 import com.manideepla.bookerang.models.GetBooksResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -39,7 +41,13 @@ public class BookController {
         return Mono.justOrEmpty(username)
                 .switchIfEmpty(ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName()))
                 .flatMap(currentUser -> bookHandler.getBooksOfAUser(currentUser))
+                .map(GetBooksResponse::new)
                 .map(ResponseEntity::ok);
 
+    }
+
+    @GetMapping
+    Mono<ResponseEntity<BooksResponse>> getBooks(@RequestParam int radius) {
+         return bookHandler.getBooksNearby(radius).map(BooksResponse::new).map(ResponseEntity::ok);
     }
 }

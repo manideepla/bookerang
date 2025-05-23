@@ -4,15 +4,20 @@ import com.manideepla.bookerang.models.AddBookRequest;
 import com.manideepla.bookerang.models.Author;
 import com.manideepla.bookerang.models.Book;
 import com.manideepla.bookerang.models.UserCopy;
-import com.manideepla.bookerang.models.GetBooksResponse;
 import com.manideepla.bookerang.models.UserCopyItem;
+import com.manideepla.bookerang.models.NearbyBookItem;
+import com.manideepla.bookerang.models.GetBooksResponse;
 import com.manideepla.bookerang.repositories.AuthorRepository;
 import com.manideepla.bookerang.repositories.BookRepository;
 import com.manideepla.bookerang.repositories.CopyRepository;
+import com.manideepla.bookerang.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -28,6 +33,9 @@ public class BookHandler {
     @Autowired
     CopyRepository copyRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     public Mono<UUID> addBook(AddBookRequest addBookRequest, String username) {
         return Mono.just(addBookRequest.author())
                 .flatMap(authorName -> authorRepository.save(new Author(null, authorName)))
@@ -38,11 +46,25 @@ public class BookHandler {
                 .map(UserCopy::id);
     }
 
-    public Mono<GetBooksResponse> getBooksOfAUser(String username) {
+    public Mono<List<UserCopyItem>> getBooksOfAUser(String username) {
         return copyRepository.findAllByOwner(username)
                 .flatMap(userCopy -> bookRepository.findById(userCopy.bookId())
                                               .map(book -> new UserCopyItem(userCopy.id().toString(), book.title())))
-                .collectList()
-                .map(GetBooksResponse::new);
+                .collectList();
+
+    }
+
+    public Mono<List<NearbyBookItem>> getBooksNearby(int radius) {
+        Mono<String> username = ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName());
+        return
+                username.flatMapMany(u -> userRepository.findUsersWithinDistance(radius, u))
+                        .flatMap(x -> getBooksOfAUser(x.username())
+                                                    .flatMapMany(Flux::fromIterable)
+                                                    .map(userCopyItem -> new NearbyBookItem(userCopyItem.id(),
+                                                                                                         userCopyItem.title(),
+                                                                                                         x.username(),
+                                                                                                         x.distance())))
+                        .collectList();
+
     }
 }
