@@ -35,10 +35,10 @@ public class BookController {
 
 
     @GetMapping({"/user", "/user/{username}"})
-    Mono<ResponseEntity<GetBooksResponse>> getBooks(@PathVariable(required = false) String username) {
+    Mono<ResponseEntity<GetBooksResponse>> getBooksOfAUser(@PathVariable(required = false) String username) {
         return Mono.justOrEmpty(username)
                 .switchIfEmpty(ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName()))
-                .flatMap(currentUser -> bookHandler.getBooks(currentUser))
+                .flatMap(currentUser -> bookHandler.getBooksOfAUser(currentUser))
                 .map(ResponseEntity::ok);
 
     }

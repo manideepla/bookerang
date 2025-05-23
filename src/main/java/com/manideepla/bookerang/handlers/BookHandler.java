@@ -38,7 +38,7 @@ public class BookHandler {
                 .map(UserCopy::id);
     }
 
-    public Mono<GetBooksResponse> getBooks(String username) {
+    public Mono<GetBooksResponse> getBooksOfAUser(String username) {
         return copyRepository.findAllByOwner(username)
                 .flatMap(userCopy -> bookRepository.findById(userCopy.bookId())
                                               .map(book -> new UserCopyItem(userCopy.id().toString(), book.title())))
