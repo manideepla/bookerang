@@ -3,13 +3,16 @@ package com.manideepla.bookerang.controllers;
 
 import com.manideepla.bookerang.JwtUtil;
 import com.manideepla.bookerang.handlers.UserHandler;
+import com.manideepla.bookerang.minions.UserMinion;
 import com.manideepla.bookerang.models.LoginRequest;
 import com.manideepla.bookerang.models.NearbyUserItem;
 import com.manideepla.bookerang.models.User;
+import com.manideepla.bookerang.models.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -25,6 +28,9 @@ public class UserController {
 
     @Autowired
     UserHandler userHandler;
+
+    @Autowired
+    UserMinion userMinion;
 
     @Autowired
     ReactiveAuthenticationManager authenticationManager;
@@ -47,9 +53,12 @@ public class UserController {
                 });
     }
 
-    @GetMapping("/{username}")
-    Mono<ResponseEntity<User>> getUser(@PathVariable String username) {
-        return userHandler.findUser(username).map(ResponseEntity::ok);
+    @GetMapping()
+    Mono<ResponseEntity<UserProfile>> getUser() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(c -> c.getAuthentication().getName())
+                .flatMap(username -> userHandler.findUser(username))
+                .map(user -> ResponseEntity.ok(userMinion.convertToProfile(user)));
     }
 
 
