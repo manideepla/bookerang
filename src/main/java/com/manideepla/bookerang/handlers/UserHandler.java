@@ -1,8 +1,8 @@
 package com.manideepla.bookerang.handlers;
 
-import com.manideepla.bookerang.minions.UserMinion;
 import com.manideepla.bookerang.models.LoginRequest;
 import com.manideepla.bookerang.models.NearbyUserItem;
+import com.manideepla.bookerang.models.UserProfile;
 import com.manideepla.bookerang.repositories.UserRepository;
 import com.manideepla.bookerang.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.ZoneOffset;
+
 
 @Service
 public class UserHandler implements ReactiveUserDetailsService {
@@ -24,22 +26,17 @@ public class UserHandler implements ReactiveUserDetailsService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Autowired
-    UserMinion userMinion;
-
     public Mono<String> saveUser(User user) {
 
         return Mono.just(user)
                 .map(u -> passwordEncoder.encode(user.password()))
-                .flatMap(hashed -> userMinion.rehashedUser(hashed, user))
+                .flatMap(hashed -> rehashedUser(hashed, user))
                 .flatMap(hashedUser -> userRepository.save(hashedUser)).map(User::username);
     }
-
 
     public Mono<User> findUser(String username) {
         return userRepository.findByUsername(username);
     }
-
 
 
     @Override
@@ -60,5 +57,14 @@ public class UserHandler implements ReactiveUserDetailsService {
         Mono<String> username = ReactiveSecurityContextHolder.getContext().map(c -> c.getAuthentication().getName());
 
         return username.map(u -> userRepository.findUsersWithinDistance(radius, u));
+    }
+
+    public Mono<User> rehashedUser(String hashed, User u) {
+        return Mono.just(u)
+                .map(user -> new User(u.username(), hashed, u.firstName(), u.lastName(), u.createdAt()));
+    }
+
+    public UserProfile convertToProfile(User user) {
+        return new UserProfile(user.firstName(), user.lastName(), user.username(), user.createdAt().withOffsetSameInstant(ZoneOffset.UTC));
     }
 }

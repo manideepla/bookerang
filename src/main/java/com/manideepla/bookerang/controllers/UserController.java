@@ -3,7 +3,6 @@ package com.manideepla.bookerang.controllers;
 
 import com.manideepla.bookerang.JwtUtil;
 import com.manideepla.bookerang.handlers.UserHandler;
-import com.manideepla.bookerang.minions.UserMinion;
 import com.manideepla.bookerang.models.LoginRequest;
 import com.manideepla.bookerang.models.NearbyUserItem;
 import com.manideepla.bookerang.models.User;
@@ -28,9 +27,6 @@ public class UserController {
 
     @Autowired
     UserHandler userHandler;
-
-    @Autowired
-    UserMinion userMinion;
 
     @Autowired
     ReactiveAuthenticationManager authenticationManager;
@@ -58,7 +54,7 @@ public class UserController {
         return ReactiveSecurityContextHolder.getContext()
                 .map(c -> c.getAuthentication().getName())
                 .flatMap(username -> userHandler.findUser(username))
-                .map(user -> ResponseEntity.ok(userMinion.convertToProfile(user)));
+                .map(user -> ResponseEntity.ok(userHandler.convertToProfile(user)));
     }
 
 
