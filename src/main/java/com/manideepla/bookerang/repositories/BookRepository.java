@@ -17,5 +17,5 @@ public interface BookRepository extends ReactiveCrudRepository<Book, UUID> {
     SET title = EXCLUDED.title, author = EXCLUDED.author
     RETURNING id
     """)
-    Mono<Author> saveOrGetBook(String title, UUID authorId);
+    Mono<Book> saveOrGetBook(String title, UUID authorId);
 }
