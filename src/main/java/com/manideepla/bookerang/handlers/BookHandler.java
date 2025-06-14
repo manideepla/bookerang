@@ -38,7 +38,7 @@ public class BookHandler {
         return Mono.just(addBookRequest.author())
                 .flatMap(authorName -> authorRepository.saveOrGetAuthor(authorName))
                 .map(author -> new Book(addBookRequest.title(), author.id(), null))
-                .flatMap(book -> bookRepository.save(book))
+                .flatMap(book -> bookRepository.saveOrGetBook(book.title(), book.author()))
                 .map(savedBook -> new UserCopy(null, savedBook.id(), username))
                 .flatMap(userCopy -> copyRepository.save(userCopy))
                 .map(UserCopy::id);
