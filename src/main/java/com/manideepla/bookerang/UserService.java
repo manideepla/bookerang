@@ -26,7 +26,7 @@ public class UserService {
             throw new LoginException("Password not correct");
         }
 
-        return result.get().username;
+        return result.get().username; //TODO change this to a JWT
     }
 
 
